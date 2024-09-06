@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Literati{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #F5E6D3;
+        }
+        .bg-cream {
+            background-color: #FFF8E7;
+        }
+        .text-maroon {
+            color: #800000;
+        }
+        .bg-maroon {
+            background-color: #800000;
+        }
+        .hover\:bg-maroon-dark:hover {
+            background-color: #600000;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+    <header class="bg-cream text-maroon p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <svg class="h-12 w-12 mr-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="100" height="100" rx="10" fill="#800000"/>
+                    <path d="M30 20 H70 Q80 20 80 30 V80 Q70 70 60 75 Q50 80 40 75 Q30 70 20 80 V30 Q20 20 30 20 Z" fill="#F5E6D3"/>
+                    <circle cx="50" cy="45" r="15" fill="#800000"/>
+                    <path d="M40 65 Q50 55 60 65" stroke="#800000" stroke-width="3"/>
+                </svg>
+                <a href="{{ url_for('home') }}" class="font-bold text-2xl">Literati</a>
+            </div>
+            <nav>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('profile') }}" class="text-maroon hover:text-maroon-dark mr-4">Profile</a>
+                    <a href="{{ url_for('logout') }}" class="text-maroon hover:text-maroon-dark">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="text-maroon hover:text-maroon-dark mr-4">Login</a>
+                    <a href="{{ url_for('register') }}" class="text-maroon hover:text-maroon-dark">Register</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto mt-8 p-8 bg-cream rounded-lg shadow-md flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-cream text-maroon text-center p-4 mt-8 shadow-md">
+        <p>&copy; 2024 Literati. All rights reserved.</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

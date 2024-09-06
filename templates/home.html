@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - Literati{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8 text-center text-maroon">Welcome to Literati</h1>
+    <p class="text-xl mb-8 text-center text-maroon">Your personal book journey starts here!</p>
+
+    {% if current_user.is_authenticated %}
+        <div class="bg-cream p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold mb-4 text-maroon">Add a New Book</h2>
+            <input type="text" id="book-search" placeholder="Search for a book" class="w-full p-2 mb-4 border rounded bg-white">
+            <ul id="search-results" class="mb-4"></ul>
+            <div id="manual-entry" style="display: none;">
+                <form action="{{ url_for('add_book') }}" method="post" class="space-y-4">
+                    <input type="text" id="book-title" name="title" required placeholder="Book Title" class="w-full p-2 border rounded bg-white">
+                    <input type="text" id="book-author" name="author" required placeholder="Author" class="w-full p-2 border rounded bg-white">
+                    <select name="sentiment" required class="w-full p-2 border rounded bg-white">
+                        <option value="beloved">I loved it</option>
+                        <option value="tolerated">It was okay</option>
+                        <option value="disliked">I didn't like it</option>
+                    </select>
+                    <button type="submit" class="w-full bg-maroon text-white p-2 rounded hover:bg-maroon-dark">Add Book</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center space-x-4">
+            <a href="{{ url_for('register') }}" class="bg-maroon text-white px-4 py-2 rounded hover:bg-maroon-dark">Register</a>
+            <a href="{{ url_for('login') }}" class="bg-maroon text-white px-4 py-2 rounded hover:bg-maroon-dark">Login</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        let searchFailed = false;
+
+        $('#book-search').on('input', function() {
+            var query = $(this).val();
+            if (query.length > 2) {
+                $.get('/search_books', {query: query})
+                    .done(function(data) {
+                        var results = $('#search-results');
+                        results.empty();
+                        if (data.length > 0) {
+                            searchFailed = false;
+                            data.forEach(function(book) {
+                                results.append('<li class="cursor-pointer hover:bg-gray-100 p-2">' +
+                                               book.title + ' by ' + book.author +
+                                               '<form action="{{ url_for('add_book') }}" method="post" class="inline ml-2">' +
+                                               '<input type="hidden" name="title" value="' + book.title + '">' +
+                                               '<input type="hidden" name="author" value="' + book.author + '">' +
+                                               '<select name="sentiment" required class="ml-2 p-1 border rounded bg-white">' +
+                                               '<option value="beloved">Loved</option>' +
+                                               '<option value="tolerated">Okay</option>' +
+                                               '<option value="disliked">Disliked</option>' +
+                                               '</select>' +
+                                               '<button type="submit" class="ml-2 bg-maroon text-white px-2 py-1 rounded hover:bg-maroon-dark">Add</button>' +
+                                               '</form></li>');
+                            });
+                            $('#manual-entry').hide();
+                        } else {
+                            results.append('<li class="p-2">No results found. You can add the book manually.</li>');
+                            searchFailed = true;
+                            $('#manual-entry').show();
+                        }
+                    })
+                    .fail(function() {
+                        searchFailed = true;
+                        $('#search-results').empty().append('<li class="p-2">Search failed. You can add the book manually.</li>');
+                        $('#manual-entry').show();
+                    });
+            } else {
+                $('#search-results').empty();
+                if (searchFailed) {
+                    $('#manual-entry').show();
+                } else {
+                    $('#manual-entry').hide();
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}Profile - Literati{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rating-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+    }
+    .beloved { background-color: #4CAF50; }
+    .tolerated { background-color: #FFC107; }
+    .disliked { background-color: #F44336; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-maroon">Welcome, {{ user.username }}!</h1>
+
+    {% for category, books, color in [('Beloved Books', beloved_books, 'beloved'), ('Tolerated Books', tolerated_books, 'tolerated'), ('Disliked Books', disliked_books, 'disliked')] %}
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-maroon">{{ category }}</h2>
+            {% if books %}
+                <ul class="space-y-4">
+                {% for book in books %}
+                    <li class="flex items-center bg-white p-4 rounded-lg shadow">
+                        <span class="rating-circle {{ color }} mr-4 flex-shrink-0">
+                            {{ "%.1f"|format(book.rating) }}
+                        </span>
+                        <div class="flex-grow">
+                            <h3 class="font-semibold text-maroon">{{ book.title }}</h3>
+                            <p class="text-gray-600">by {{ book.author }}</p>
+                        </div>
+                        <span class="text-gray-500 ml-4">Global Position: {{ book.global_position }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="italic text-gray-500">No books in this category yet.</p>
+            {% endif %}
+        </section>
+    {% endfor %}
+
+    <div class="mt-8">
+        <a href="{{ url_for('home') }}" class="bg-maroon text-white px-6 py-2 rounded-lg hover:bg-maroon-dark transition duration-300">Add New Book</a>
+    </div>
+</div>
+{% endblock %}

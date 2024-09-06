@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Books - Literati</title>
+</head>
+<body>
+    <h1>Search for Books</h1>
+    <form method="GET" action="{{ url_for('search_books') }}">
+        <input type="text" name="query" placeholder="Enter book title or author">
+        <input type="submit" value="Search">
+    </form>
+    <a href="{{ url_for('profile') }}">Back to Profile</a>
+</body>
+</html>

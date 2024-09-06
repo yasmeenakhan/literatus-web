@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate New Book - Literati</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h1 class="text-2xl font-bold mb-6 text-center">Compare Books</h1>
+        <p class="mb-4 text-center">Which book do you prefer?</p>
+        <form action="{{ url_for('compare_books') }}" method="post" class="space-y-4">
+            <input type="hidden" name="new_book_id" value="{{ new_book.id }}">
+            <input type="hidden" name="compared_book_id" value="{{ compared_book.id }}">
+            <button type="submit" name="preference" value="1" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">
+                {{ new_book.title }} by {{ new_book.author }}
+            </button>
+            <button type="submit" name="preference" value="2" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">
+                {{ compared_book.title }} by {{ compared_book.author }}
+            </button>
+        </form>
+    </div>
+</body>
+</html>
