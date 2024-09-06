@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Literati{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: #F5E6D3;
+            font-family: 'EB Garamond', serif;
         }
         .bg-cream {
             background-color: #FFF8E7;
@@ -21,10 +23,13 @@
         .hover\:bg-maroon-dark:hover {
             background-color: #600000;
         }
+        h1, h2, h3, h4, h5, h6, .font-title {
+            font-family: 'Caslon', serif;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col text-lg">
     <header class="bg-cream text-maroon p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center">
@@ -34,7 +39,7 @@
                     <circle cx="50" cy="45" r="15" fill="#800000"/>
                     <path d="M40 65 Q50 55 60 65" stroke="#800000" stroke-width="3"/>
                 </svg>
-                <a href="{{ url_for('home') }}" class="font-bold text-2xl">Literati</a>
+                <a href="{{ url_for('home') }}" class="font-title font-bold text-3xl">Literati</a>
             </div>
             <nav>
                 {% if current_user.is_authenticated %}

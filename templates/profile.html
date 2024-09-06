@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}Profile - Literati{% endblock %}
+{% block title %}{{ user.username.capitalize() }}'s Profile - Literati{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -17,25 +17,56 @@
     .beloved { background-color: #4CAF50; }
     .tolerated { background-color: #FFC107; }
     .disliked { background-color: #F44336; }
+    .category-header {
+        border-bottom: 2px solid #800000;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    .category-icon {
+        margin-right: 0.5rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-maroon">Welcome, {{ user.username }}!</h1>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-maroon font-title">Your Library</h1>
+        <a href="{{ url_for('home') }}" class="bg-maroon text-white px-4 py-2 rounded-lg hover:bg-maroon-dark transition duration-300">Add New Book</a>
+    </div>
 
-    {% for category, books, color in [('Beloved Books', beloved_books, 'beloved'), ('Tolerated Books', tolerated_books, 'tolerated'), ('Disliked Books', disliked_books, 'disliked')] %}
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8 flex items-center">
+        <img src="https://api.dicebear.com/6.x/initials/svg?seed={{ user.username }}" alt="{{ user.username }}" class="w-20 h-20 rounded-full mr-6">
+        <div>
+            <h2 class="text-2xl font-semibold text-maroon font-title">{{ user.username.capitalize() }}</h2>
+            {% if user.beloved_books %}
+                <p class="text-gray-600">Current favorite: {{ user.beloved_books[0].title }} by {{ user.beloved_books[0].author }}</p>
+            {% else %}
+                <p class="text-gray-600">No favorite book yet</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% for category, books, color, icon in [
+        ('Beloved Books', user.beloved_books, 'beloved', '❤️'),
+        ('Tolerated Books', user.tolerated_books, 'tolerated', '😐'),
+        ('Disliked Books', user.disliked_books, 'disliked', '👎')
+    ] %}
         <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-maroon">{{ category }}</h2>
+            <h2 class="text-2xl font-semibold text-maroon font-title category-header">
+                <span class="category-icon">{{ icon }}</span>{{ category }}
+            </h2>
             {% if books %}
                 <ul class="space-y-4">
-                {% for book in books %}
+                {% for book in books|sort(attribute='rating', reverse=True) %}
                     <li class="flex items-center bg-white p-4 rounded-lg shadow">
                         <span class="rating-circle {{ color }} mr-4 flex-shrink-0">
                             {{ "%.1f"|format(book.rating) }}
                         </span>
                         <div class="flex-grow">
-                            <h3 class="font-semibold text-maroon">{{ book.title }}</h3>
+                            <h3 class="font-semibold text-maroon font-title">{{ book.title }}</h3>
                             <p class="text-gray-600">by {{ book.author }}</p>
                         </div>
                         <span class="text-gray-500 ml-4">Global Position: {{ book.global_position }}</span>
@@ -47,9 +78,5 @@
             {% endif %}
         </section>
     {% endfor %}
-
-    <div class="mt-8">
-        <a href="{{ url_for('home') }}" class="bg-maroon text-white px-6 py-2 rounded-lg hover:bg-maroon-dark transition duration-300">Add New Book</a>
-    </div>
 </div>
 {% endblock %}

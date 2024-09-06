@@ -1,25 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rate New Book - Literati</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 class="text-2xl font-bold mb-6 text-center">Compare Books</h1>
-        <p class="mb-4 text-center">Which book do you prefer?</p>
-        <form action="{{ url_for('compare_books') }}" method="post" class="space-y-4">
-            <input type="hidden" name="new_book_id" value="{{ new_book.id }}">
-            <input type="hidden" name="compared_book_id" value="{{ compared_book.id }}">
-            <button type="submit" name="preference" value="1" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">
-                {{ new_book.title }} by {{ new_book.author }}
+{% extends "layout.html" %}
+
+{% block title %}Rate New Book - Literati{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <h1 class="text-3xl font-bold mb-6 text-maroon font-title">Compare Books</h1>
+    <p class="mb-8 text-maroon">Which book do you prefer?</p>
+    
+    <form action="{{ url_for('compare_books') }}" method="post" class="space-y-6">
+        <input type="hidden" name="new_book_id" value="{{ new_book.id }}">
+        <input type="hidden" name="compared_book_id" value="{{ compared_book.id }}">
+        
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer">
+            <button type="submit" name="preference" value="1" class="w-full text-left focus:outline-none">
+                <h2 class="text-2xl font-semibold mb-2 text-maroon font-title">{{ new_book.title }}</h2>
+                <p class="text-gray-600">by {{ new_book.author }}</p>
             </button>
-            <button type="submit" name="preference" value="2" class="w-full bg-indigo-600 text-white p-2 rounded hover:bg-indigo-700">
-                {{ compared_book.title }} by {{ compared_book.author }}
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer">
+            <button type="submit" name="preference" value="2" class="w-full text-left focus:outline-none">
+                <h2 class="text-2xl font-semibold mb-2 text-maroon font-title">{{ compared_book.title }}</h2>
+                <p class="text-gray-600">by {{ compared_book.author }}</p>
             </button>
-        </form>
-    </div>
-</body>
-</html>
+        </div>
+    </form>
+    
+    <p class="mt-8 text-gray-600 italic">Click on the book you prefer to continue rating.</p>
+</div>
+{% endblock %}
