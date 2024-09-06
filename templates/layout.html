@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Literati{% endblock %}</title>
+    <title>{% block title %}Literatus{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -33,14 +33,14 @@
     <header class="bg-cream text-maroon p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <img src="{{ url_for('static', filename='images/quilless.png') }}" alt="Literati Logo" class="h-16 w-16 mr-2">
+                <img src="{{ url_for('static', filename='images/quilless.png') }}" alt="Literatus Logo" class="h-16 w-16 mr-2">
 <!--               <svg class="h-12 w-12 mr-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">-->
 <!--                    <rect width="100" height="100" rx="10" fill="#800000"/>-->
 <!--                    <path d="M30 20 H70 Q80 20 80 30 V80 Q70 70 60 75 Q50 80 40 75 Q30 70 20 80 V30 Q20 20 30 20 Z" fill="#F5E6D3"/>-->
 <!--                    <circle cx="50" cy="45" r="15" fill="#800000"/>-->
 <!--                    <path d="M40 65 Q50 55 60 65" stroke="#800000" stroke-width="3"/>-->
 <!--                </svg>-->
-                <a href="{{ url_for('home') }}" class="font-title font-bold text-3xl">Literati</a>
+                <a href="{{ url_for('home') }}" class="font-title font-bold text-3xl">Literatus</a>
             </div>
             <nav>
                 {% if current_user.is_authenticated %}
@@ -59,7 +59,7 @@
     </main>
 
     <footer class="bg-cream text-maroon text-center p-4 mt-8 shadow-md">
-        <p>&copy; 2024 Literati. All rights reserved.</p>
+        <p>&copy; 2024 Literatus. All rights reserved.</p>
     </footer>
 
     {% block extra_js %}{% endblock %}

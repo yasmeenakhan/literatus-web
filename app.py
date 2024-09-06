@@ -1,14 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///literati.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///literatus.db'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
