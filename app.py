@@ -3,11 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
-
+import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///literatus.db'
+#app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///literatus.db')
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///literatus.db'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
