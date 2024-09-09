@@ -4,6 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 import os
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 
@@ -20,6 +21,8 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'hannah_arendt_is_great'
 #app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'hannah_arendt_is_great')
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
 #app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
 #app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
 #app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///literatus.db')
@@ -27,6 +30,7 @@ db = SQLAlchemy(app)
 #db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
 
 
 class User(UserMixin, db.Model):
