@@ -16,22 +16,11 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri or 'sqlite:///literatus.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'hannah_arendt_is_great')
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///literatus.db')
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'hannah_arendt_is_great')
-
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-#app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
-#app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///literatus.db')
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///literatus.db'
-#db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
-
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
