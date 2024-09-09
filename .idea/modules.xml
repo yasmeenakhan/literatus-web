@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/literati-web.iml" filepath="$PROJECT_DIR$/.idea/literati-web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/literatus-web.iml" filepath="$PROJECT_DIR$/.idea/literatus-web.iml" />
     </modules>
   </component>
 </project>
