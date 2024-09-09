@@ -6,11 +6,21 @@ import requests
 import os
 
 app = Flask(__name__)
-#app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
+
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///literatus.db')
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///literatus.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'hannah_arendt_is_great')
+
 db = SQLAlchemy(app)
+#app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
+#app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key')
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///literatus.db')
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///literatus.db'
+#db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
