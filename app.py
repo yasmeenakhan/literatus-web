@@ -240,6 +240,118 @@ def compare_books():
     return render_template('rate_new_book.html', new_book=new_book, compared_book=next_book)
 
 
+@app.route('/delete_book/<int:book_id>', methods=['POST'])
+@login_required
+def delete_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    if book.user_id != current_user.id:
+        flash('You do not have permission to delete this book.')
+        return redirect(url_for('profile'))
+
+    # Remove the book
+    db.session.delete(book)
+
+    # Update positions of remaining books in the same sentiment category
+    remaining_books = Book.query.filter_by(user_id=current_user.id, sentiment=book.sentiment).filter(
+        Book.position > book.position).all()
+    for remaining_book in remaining_books:
+        remaining_book.position -= 1
+
+    db.session.commit()
+    flash('Book deleted successfully.')
+    return redirect(url_for('profile'))
+
+
+@app.route('/initiate_rerank/<int:book_id>')
+@login_required
+def initiate_rerank(book_id):
+    book_to_rerank = Book.query.get_or_404(book_id)
+    if book_to_rerank.user_id != current_user.id:
+        flash('You do not have permission to rerank this book.')
+        return redirect(url_for('profile'))
+
+    books_to_compare = Book.query.filter_by(user_id=current_user.id, sentiment=book_to_rerank.sentiment).order_by(
+        Book.position).all()
+    books_to_compare = [book for book in books_to_compare if book.id != book_to_rerank.id]
+
+    if not books_to_compare:
+        flash('No other books to compare for reranking.')
+        return redirect(url_for('profile'))
+
+    session['books_to_compare'] = [book.id for book in books_to_compare]
+    session['comparison_index'] = len(books_to_compare) // 2
+    session['book_to_rerank_id'] = book_to_rerank.id
+
+    compared_book = books_to_compare[session['comparison_index']]
+    return render_template('rerank_book.html', book_to_rerank=book_to_rerank, compared_book=compared_book)
+
+
+@app.route('/rerank_book', methods=['POST'])
+@login_required
+def rerank_book():
+    book_to_rerank_id = session.get('book_to_rerank_id')
+    compared_book_id = int(request.form['compared_book_id'])
+    preference = int(request.form['preference'])
+
+    book_to_rerank = Book.query.get_or_404(book_to_rerank_id)
+    compared_book = Book.query.get_or_404(compared_book_id)
+
+    books_to_compare = [Book.query.get(book_id) for book_id in session['books_to_compare']]
+    index = session['comparison_index']
+
+    if preference == 1:  # Book to rerank is preferred
+        books_to_compare = books_to_compare[:index]
+    else:  # Compared book is preferred
+        books_to_compare = books_to_compare[index + 1:]
+
+    if not books_to_compare:
+        # We've found the new position for the book
+        if preference == 1:
+            if book_to_rerank.position > compared_book.position:
+                new_position = compared_book.position
+            else:
+                new_position = book_to_rerank.position  # Maintain current position
+        else:
+            if book_to_rerank.position < compared_book.position:
+                new_position = compared_book.position
+            else:
+                new_position = book_to_rerank.position  # Maintain current position
+        if new_position != book_to_rerank.position:
+            reposition_book(book_to_rerank, new_position)
+        else: flash('Book reranking completed! The book remains in its current position.')
+        flash('Book reranking completed!')
+        return redirect(url_for('profile'))
+
+    session['books_to_compare'] = [book.id for book in books_to_compare]
+    session['comparison_index'] = len(books_to_compare) // 2
+
+    next_book = books_to_compare[session['comparison_index']]
+    return render_template('rerank_book.html', book_to_rerank=book_to_rerank, compared_book=next_book)
+
+
+def reposition_book(book, new_position):
+    old_position = book.position
+
+    if new_position == old_position:
+        return
+
+    books_to_update = Book.query.filter(
+        Book.user_id == book.user_id,
+        Book.sentiment == book.sentiment,
+        ((Book.position >= new_position) & (Book.position < old_position)) |
+        ((Book.position <= new_position) & (Book.position > old_position))
+    ).all()
+
+    for update_book in books_to_update:
+        if old_position < new_position:
+            update_book.position -= 1
+        else:
+            update_book.position += 1
+
+    book.position = new_position
+    db.session.commit()
+
+
 def insert_book(new_book, insert_position):
     books_to_update = Book.query.filter(
         Book.user_id == new_book.user_id,

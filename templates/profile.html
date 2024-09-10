@@ -24,6 +24,19 @@
         display: flex;
         align-items: center;
     }
+        .delete-button {
+        color: #ef4444;
+    }
+    .delete-button:hover {
+        color: #dc2626;
+    }
+    .rerank-button {
+        background-color: #71716F;
+        color: white;
+    }
+    .rerank-button:hover {
+        background-color: #600000;
+    }
     .category-icon {
         margin-right: 0.5rem;
     }
@@ -61,15 +74,27 @@
             {% if books %}
                 <ul class="space-y-4">
                 {% for book in books|sort(attribute='rating', reverse=True) %}
-                    <li class="flex items-center bg-white p-4 rounded-lg shadow">
-                        <span class="rating-circle {{ color }} mr-4 flex-shrink-0">
-                            {{ "%.1f"|format(book.rating) }}
-                        </span>
-                        <div class="flex-grow">
-                            <h3 class="font-semibold text-maroon font-title">{{ book.title }}</h3>
-                            <p class="text-gray-600">by {{ book.author }}</p>
+                    <li class="book-item bg-white p-4 rounded-lg shadow-md mb-4 flex items-center justify-between">
+                        <div class="flex-grow flex items-center">
+                            <span class="rating-circle {{ color }} mr-4 flex-shrink-0">
+                                {{ "%.1f"|format(book.rating) }}
+                            </span>
+                            <div class="book-info">
+                                <h3 class="font-semibold text-maroon font-title">{{ book.title }}</h3>
+                                <p>by {{ book.author }}</p>
+                            </div>
                         </div>
-                        <span class="text-gray-500 ml-4">#{{ book.global_position }}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-gray-500 ml-2">#{{ book.global_position }}</span>
+                            <button class="action-button delete-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                            <a href="{{ url_for('initiate_rerank', book_id=book.id) }}" class="action-button rerank-button bg-maroon text-white px-2 py-1 rounded hover:bg-maroon-dark transition duration-300">
+                                Rerank
+                            </a>
+                        </div>
                     </li>
                 {% endfor %}
                 </ul>
