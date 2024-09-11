@@ -97,7 +97,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
-            return redirect(url_for('profile'))
+            return redirect(url_for('profile', username=user.username))
         flash('Invalid username or password')
     return render_template('login.html')
 
@@ -109,12 +109,50 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/profile')
+# @app.route('/profile')
+# @login_required
+# def profile():
+#     beloved_books = Book.query.filter_by(user_id=current_user.id, sentiment='beloved').order_by(Book.position).all()
+#     tolerated_books = Book.query.filter_by(user_id=current_user.id, sentiment='tolerated').order_by(Book.position).all()
+#     disliked_books = Book.query.filter_by(user_id=current_user.id, sentiment='disliked').order_by(Book.position).all()
+#
+#     all_books = beloved_books + tolerated_books + disliked_books
+#     total_books = len(all_books)
+#
+#     for i, book in enumerate(all_books):
+#         if book.sentiment == 'beloved':
+#             base = 7.5
+#             max_rating = 10
+#         elif book.sentiment == 'tolerated':
+#             base = 4.5
+#             max_rating = 7
+#         else:  # disliked
+#             base = 1
+#             max_rating = 4
+#
+#         category_books = beloved_books if book in beloved_books else \
+#             tolerated_books if book in tolerated_books else \
+#                 disliked_books
+#         category_position = category_books.index(book)
+#         category_total = len(category_books)
+#
+#         book.rating = base + ((max_rating - base) * (1 - (category_position / (category_total - 1 or 1))))
+#         book.rating = round(book.rating, 1)  # Round to one decimal place
+#         book.global_position = i + 1
+#
+#     return render_template('profile.html', user=current_user,
+#                            beloved_books=beloved_books,
+#                            tolerated_books=tolerated_books,
+#                            disliked_books=disliked_books)
+
+@app.route('/profile/<username>')
 @login_required
-def profile():
-    beloved_books = Book.query.filter_by(user_id=current_user.id, sentiment='beloved').order_by(Book.position).all()
-    tolerated_books = Book.query.filter_by(user_id=current_user.id, sentiment='tolerated').order_by(Book.position).all()
-    disliked_books = Book.query.filter_by(user_id=current_user.id, sentiment='disliked').order_by(Book.position).all()
+def profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+
+    beloved_books = Book.query.filter_by(user_id=user.id, sentiment='beloved').order_by(Book.position).all()
+    tolerated_books = Book.query.filter_by(user_id=user.id, sentiment='tolerated').order_by(Book.position).all()
+    disliked_books = Book.query.filter_by(user_id=user.id, sentiment='disliked').order_by(Book.position).all()
 
     all_books = beloved_books + tolerated_books + disliked_books
     total_books = len(all_books)
@@ -140,10 +178,20 @@ def profile():
         book.rating = round(book.rating, 1)  # Round to one decimal place
         book.global_position = i + 1
 
-    return render_template('profile.html', user=current_user,
+    return render_template('profile.html', user=user,
                            beloved_books=beloved_books,
                            tolerated_books=tolerated_books,
-                           disliked_books=disliked_books)
+                           disliked_books=disliked_books,
+                           is_own_profile=current_user.is_authenticated and current_user.id == user.id)
+
+
+@app.route('/search_users')
+def search_users():
+    query = request.args.get('query', '')
+    if query:
+        users = User.query.filter(User.username.ilike(f'%{query}%')).all()
+        return render_template('search_users.html', users=users, query=query)
+    return render_template('search_users.html')
 
 
 @app.route('/search_books')
@@ -185,7 +233,7 @@ def rate_new_book(book_id):
     new_book = db.session.get(Book, book_id)
     if not new_book:
         flash('Book not found.')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     books_to_compare = Book.query.filter_by(user_id=current_user.id, sentiment=new_book.sentiment).order_by(Book.position).all()
     books_to_compare = [book for book in books_to_compare if book.id != new_book.id]
@@ -194,7 +242,7 @@ def rate_new_book(book_id):
         new_book.position = 1
         db.session.commit()
         flash('Book rating completed!')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     session['books_to_compare'] = [book.id for book in books_to_compare]
     session['comparison_index'] = len(books_to_compare) // 2
@@ -216,7 +264,7 @@ def compare_books():
 
     if not new_book or not compared_book:
         flash('Error: Book not found.')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     books_to_compare = [db.session.get(Book, book_id) for book_id in session['books_to_compare']]
     index = session['comparison_index']
@@ -231,7 +279,7 @@ def compare_books():
         insert_position = compared_book.position if preference == 1 else compared_book.position + 1
         insert_book(new_book, insert_position)
         flash('Book rating completed!')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     session['books_to_compare'] = [book.id for book in books_to_compare]
     session['comparison_index'] = len(books_to_compare) // 2
@@ -246,7 +294,7 @@ def delete_book(book_id):
     book = Book.query.get_or_404(book_id)
     if book.user_id != current_user.id:
         flash('You do not have permission to delete this book.')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     # Remove the book
     db.session.delete(book)
@@ -259,7 +307,7 @@ def delete_book(book_id):
 
     db.session.commit()
     flash('Book deleted successfully.')
-    return redirect(url_for('profile'))
+    return redirect(url_for('profile', username=current_user.username))
 
 
 @app.route('/initiate_rerank/<int:book_id>')
@@ -268,7 +316,7 @@ def initiate_rerank(book_id):
     book_to_rerank = Book.query.get_or_404(book_id)
     if book_to_rerank.user_id != current_user.id:
         flash('You do not have permission to rerank this book.')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     books_to_compare = Book.query.filter_by(user_id=current_user.id, sentiment=book_to_rerank.sentiment).order_by(
         Book.position).all()
@@ -276,7 +324,7 @@ def initiate_rerank(book_id):
 
     if not books_to_compare:
         flash('No other books to compare for reranking.')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     session['books_to_compare'] = [book.id for book in books_to_compare]
     session['comparison_index'] = len(books_to_compare) // 2
@@ -320,7 +368,7 @@ def rerank_book():
             reposition_book(book_to_rerank, new_position)
         else: flash('Book reranking completed! The book remains in its current position.')
         flash('Book reranking completed!')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile', username=current_user.username))
 
     session['books_to_compare'] = [book.id for book in books_to_compare]
     session['comparison_index'] = len(books_to_compare) // 2

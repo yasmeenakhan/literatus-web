@@ -29,7 +29,7 @@
     <p class="mb-8">Click on the book you prefer to continue reranking.</p>
 
     <div class="mt-8">
-        <a href="{{ url_for('profile') }}" class="text-maroon hover:underline">Cancel and return to profile</a>
+        <a href="{{ url_for('profile', username=current_user.username) }}" class="text-maroon hover:underline">Cancel and return to profile</a>
     </div>
 </div>
 {% endblock %}

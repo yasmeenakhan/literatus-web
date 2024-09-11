@@ -14,6 +14,6 @@
         <input type="text" id="author" name="author" required><br><br>
         <input type="submit" value="Add Book">
     </form>
-    <a href="{{ url_for('profile') }}">Back to Profile</a>
+    <a href="{{ url_for('profile', username=current_user.username) }}">Back to Profile</a>
 </body>
 </html>

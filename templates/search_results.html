@@ -24,6 +24,6 @@
         <p>No books found.</p>
     {% endif %}
     <a href="{{ url_for('search_books') }}">New Search</a>
-    <a href="{{ url_for('profile') }}">Back to Profile</a>
+    <a href="{{ url_for('profile', username=user.username) }}">Back to Profile</a>
 </body>
 </html>

@@ -11,6 +11,6 @@
         <input type="text" name="query" placeholder="Enter book title or author">
         <input type="submit" value="Search">
     </form>
-    <a href="{{ url_for('profile') }}">Back to Profile</a>
+    <a href="{{ url_for('profile', username=current_user.username) }}">Back to Profile</a>
 </body>
 </html>
