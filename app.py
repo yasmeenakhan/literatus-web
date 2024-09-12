@@ -55,6 +55,8 @@ class Book(db.Model):
     sentiment = db.Column(db.String(20), nullable=False)
     position = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    google_books_url = db.Column(db.Text)  # New field for Google Books URL
+
 
 
 @login_manager.user_loader
@@ -207,7 +209,12 @@ def search_books():
                 volume_info = item.get('volumeInfo', {})
                 title = volume_info.get('title', 'Unknown Title')
                 authors = volume_info.get('authors', ['Unknown Author'])
-                books.append({"title": title, "author": authors[0]})
+                google_books_url = volume_info.get('infoLink', '')  # Get the Google Books URL
+                books.append({
+                    "title": title,
+                    "author": authors[0],
+                    "google_books_url": google_books_url
+                })
             return jsonify(books)
     return jsonify([])
 
@@ -215,11 +222,25 @@ def search_books():
 @app.route('/add_book', methods=['POST'])
 @login_required
 def add_book():
-    title = request.form['title']
-    author = request.form['author']
-    sentiment = request.form['sentiment']
+    print("Received form data:", request.form)
+    title = request.form.get('title')
+    author = request.form.get('author')
+    sentiment = request.form.get('sentiment')
+    google_books_url = request.form.get('google_books_url')  # New field
 
-    new_book = Book(title=title, author=author, sentiment=sentiment, user_id=current_user.id, position=0)
+    if not all([title, author, sentiment]):
+        missing_fields = [field for field in ['title', 'author', 'sentiment'] if not request.form.get(field)]
+        flash(f"Error: Missing required fields: {', '.join(missing_fields)}")
+        return redirect(url_for('search_books'))
+
+    new_book = Book(
+        title=title,
+        author=author,
+        sentiment=sentiment,
+        user_id=current_user.id,
+        position=0,
+        google_books_url=google_books_url  # Add the Google Books URL
+    )
     db.session.add(new_book)
     db.session.commit()
 

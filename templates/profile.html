@@ -83,7 +83,12 @@
                                 {{ "%.1f"|format(book.rating) }}
                             </span>
                             <div class="book-info">
-                                <h3 class="font-semibold text-maroon font-title">{{ book.title }}</h3>
+                                {% if book.google_books_url %}
+                                    <a href="{{ book.google_books_url }}" target="_blank" class="font-semibold text-maroon font-title hover:underline">{{ book.title }}</a>
+                                {% else %}
+                                    <h3 class="font-semibold text-maroon font-title">{{ book.title }}</h3>
+                                {% endif %}
+<!--                                <h3 class="font-semibold text-maroon font-title">{{ book.title }}</h3>-->
                                 <p>by {{ book.author }}</p>
                             </div>
                         </div>

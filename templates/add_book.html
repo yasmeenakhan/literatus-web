@@ -7,13 +7,35 @@
 </head>
 <body>
     <h1>Add a New Book</h1>
-    <form method="POST">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required><br><br>
-        <label for="author">Author:</label>
-        <input type="text" id="author" name="author" required><br><br>
-        <input type="submit" value="Add Book">
-    </form>
+        <form method="POST" action="{{ url_for('add_book') }}">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" value="{{ request.args.get('title', '') }}" required>
+
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="author" value="{{ request.args.get('author', '') }}" required>
+
+            <input type="hidden" id="google_books_url" name="google_books_url" value="{{ request.args.get('url', '') }}">
+
+            <label for="sentiment">Sentiment:</label>
+            <select id="sentiment" name="sentiment" required>
+                <option value="beloved">Beloved</option>
+                <option value="tolerated">Tolerated</option>
+                <option value="disliked">Disliked</option>
+            </select>
+
+            <button type="submit">Add Book</button>
+        </form>
+<!--    <form method="POST">-->
+<!--        <label for="title">Title:</label>-->
+<!--        <input type="text" id="title" name="title" required><br><br>-->
+<!--        <label for="author">Author:</label>-->
+<!--        <input type="text" id="author" name="author" required><br><br>-->
+
+<!--        <input type="hidden" id="google_books_url" name="google_books_url" value="{{ request.args.get('url', '') }}">-->
+
+<!--        <input type="submit" value="Add Book">-->
+
+<!--    </form>-->
     <a href="{{ url_for('profile', username=current_user.username) }}">Back to Profile</a>
 </body>
 </html>
